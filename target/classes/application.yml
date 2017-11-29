@@ -1,0 +1,38 @@
+spring:
+    datasource:
+        url: jdbc:mysql://localhost:3306/dev_db
+        username: root
+        password: root
+        driver-class-name: com.mysql.jdbc.Driver
+confirm:
+  order:
+    request: 
+        queue : confirmedOrderQueue
+        routingKey : confirmOrderRoutingKey
+    response:
+        queue : confirmOrderResponseQueue2
+        routingKey : confirmOrderResponseRoutingKey
+
+cancel:
+  order:
+    request:
+      queue : cancelledOrderQueue
+      routingKey : cancelOrderRoutingKey
+
+
+routing:
+  key : fixedRoutingKey
+
+dead:
+    letter:
+        queue:
+            name: deadLetterQueue
+
+server:
+  port : 9023
+
+queue:
+  name : microserviceAppQueue
+
+exchange:
+  name : orderToInventoryExchange

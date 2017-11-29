@@ -1,0 +1,64 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: order-app
+  labels:
+    name: order-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      name: order-app
+  template:
+    metadata:
+      labels:
+        name: order-app
+    spec:
+      containers:
+      - name: order-app
+        image: hub.magellancloud.com/pes/order
+        imagePullPolicy: Always
+        name: order-app
+        resources:
+          limits:
+            cpu: 0.5
+            memory: 1Gi
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: k8s
+      imagePullSecrets:
+      - name: magellanregistry
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-app
+  labels:
+    name: order-app
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http
+  type: ClusterIP
+  selector:
+    name: order-app
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: order-app
+spec:
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: order-app
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+
